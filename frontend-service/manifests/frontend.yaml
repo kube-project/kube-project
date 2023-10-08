@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  ports:
+  - port: 8081
+  selector:
+    app: frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: ghcr.io/kube-project/frontend-service:v0.0.1
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: MYSQL_CONNECTION
+          value: "mysql.default.svc.cluster.local"
+        - name: MYSQL_USERPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: kube-face-secret
+              key: mysql_userpassword
+        - name: MYSQL_PORT
+          value: "3306"
+        - name: MYSQL_DBNAME
+          value: kube
+        - name: FRONTEND_PORT
+          value: "8081"
+        ports:
+        - containerPort: 8081
+          hostPort: 8081
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "300m"
+            memory: "512Mi"
