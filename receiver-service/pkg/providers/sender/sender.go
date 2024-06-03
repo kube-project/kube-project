@@ -13,13 +13,13 @@ type Config struct {
 	Logger  zerolog.Logger
 }
 
-type nsqSender struct {
+type NSQSender struct {
 	config Config
 }
 
 // NewNSQSender defines a sender which uses NSQ as a queuing system.
-func NewNSQSender(cfg Config) *nsqSender {
-	return &nsqSender{config: cfg}
+func NewNSQSender(cfg Config) *NSQSender {
+	return &NSQSender{config: cfg}
 }
 
 // SendImage takes the ID of an image and sends it along in the queue.
@@ -28,7 +28,7 @@ func NewNSQSender(cfg Config) *nsqSender {
 // Also, I want to be able to change anything about
 // the image later on, but the ID will still remain
 // to be the ID.
-func (s *nsqSender) SendImage(i uint64) error {
+func (s *NSQSender) SendImage(i uint64) error {
 	s.config.Logger.Info().Uint64("id", i).Msg("sending image id to queue...")
 	config := nsq.NewConfig()
 	// The producer needs to be co-located with nsqd, so it can send messages to a local queue.

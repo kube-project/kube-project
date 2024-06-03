@@ -5,17 +5,16 @@ import (
 	"flag"
 	"os"
 
-	"github.com/kube-project/receiver-service/pkg/providers/images"
-	"github.com/kube-project/receiver-service/pkg/providers/sender"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
+	"github.com/kube-project/receiver-service/pkg/providers/images"
+	"github.com/kube-project/receiver-service/pkg/providers/sender"
 	"github.com/kube-project/receiver-service/pkg/service"
 )
 
 var (
 	rootArgs struct {
-		service      service.Config
 		imgConfig    images.Config
 		senderConfig sender.Config
 	}
@@ -37,7 +36,7 @@ func main() {
 	rootArgs.senderConfig.Logger = logger
 	senderProvider := sender.NewNSQSender(rootArgs.senderConfig)
 
-	srvc := service.New(rootArgs.service, service.Dependencies{
+	srvc := service.New(service.Dependencies{
 		ImageProvider: imgProvider,
 		SendProvider:  senderProvider,
 		Logger:        logger,

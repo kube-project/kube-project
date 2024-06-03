@@ -16,16 +16,6 @@ import (
 	"github.com/kube-project/receiver-service/pkg/providers"
 )
 
-// Config is everything that this service needs to work.
-type Config struct {
-	Nsq struct {
-		Address string
-	}
-	Producer struct {
-		Address string
-	}
-}
-
 // Dependencies are providers which this service operates with.
 type Dependencies struct {
 	ImageProvider providers.ImageProvider
@@ -35,8 +25,7 @@ type Dependencies struct {
 
 // Receiver represents the service object of the receiver.
 type Receiver struct {
-	config Config
-	deps   Dependencies
+	deps Dependencies
 }
 
 // Path is a single path of an image to process.
@@ -117,6 +106,7 @@ func (s *Receiver) postImages(w http.ResponseWriter, r *http.Request) {
 			Status:   models.PENDING,
 		}
 
+		// TODO: This could use a bulk insert or a prepared statement instead.
 		savedImage, err := s.deps.ImageProvider.SaveImage(&image)
 		if err != nil {
 			fmt.Fprintf(w, "got error while saving image: %s; moving on to next...", err)
@@ -135,10 +125,9 @@ func (s *Receiver) postImages(w http.ResponseWriter, r *http.Request) {
 }
 
 // New creates a new service will all its needed configuration.
-func New(cfg Config, deps Dependencies) *Receiver {
+func New(deps Dependencies) *Receiver {
 	s := &Receiver{
-		config: cfg,
-		deps:   deps,
+		deps: deps,
 	}
 	return s
 }
